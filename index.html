@@ -1,0 +1,497 @@
+    <!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width,initial-scale=1">
+  
+        
+<title>Positif 1</title>
+
+<style>
+
+body{
+    margin:0;
+    overflow:hidden;
+    background:white;
+    font-family:Arial,sans-serif;
+}
+
+
+
+/* SPHERE */
+
+
+#sphere{
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100vw;
+    height:100vh;
+
+    overflow:hidden;
+}
+ 
+
+
+.sphereItem{
+    position:absolute;
+    left:50%;
+    transform:translate(-50%,-50%);
+    white-space:nowrap;
+    //font-weight:bold;
+}
+
+
+#openTime {
+   
+ position: fixed;
+    bottom: 2px;
+    right: 5px;
+    font-size: 4px;
+    color: white;
+    opacity: 0.7;
+
+}
+
+</style>
+</head>
+
+<body>
+
+
+<div id="sphere"></div>
+<div id="openTime"></div>
+
+<script>
+
+// ======================================
+// DATA
+// ======================================
+const numbers = ["Divinité","Angélique","Infini","Paradis","Belle vie","Merveille","Tout va bien","Gratitude","Abondance","Vrai Soi","Jeunesse éternelle","Beauté","Authenticité","Eternité","Jouvence","Pleine forme","Homeostasie","Sensualité","Vitalité","Bonne santé","Amour universel","Liberté","Volupté","Découverte","Réalité","Bien être","Joie","Jouissance","Aisance","Confort","Agapè","Bonheur","Florès","Jovial","Harmonie","Merci","Namasté"];
+
+  
+  // COLORS
+// ======================================
+
+const colors = [
+
+    "red",
+    "orange",
+    "yellow",
+    "green",
+    "blue",
+    "indigo",
+    "violet"
+    
+];
+
+// ======================================
+// SPHERE
+// ======================================
+
+const levelCount = 60;
+const verticalSpread = 1.15;
+let sphereItems = [];
+
+let dataIndex = 0;
+
+let phase = 0;
+
+let lastMove = 0;
+
+let colorIndex = 0;
+let previousDirection = 1;
+
+// ======================================
+// CREATE ITEM
+// ======================================
+function nextIndex(i){
+
+    return (
+        i + 1
+    ) % numbers.length;
+}
+
+function prevIndex(i){
+
+    return (
+        i - 1 +
+        numbers.length
+    ) % numbers.length;
+}
+function createTopItem(){
+
+    let newIndex;
+
+    if(
+        sphereItems.length === 0
+    ){
+        newIndex = 0;
+    }
+    else{
+
+        newIndex =
+            nextIndex(
+                sphereItems[0].index
+            );
+    }
+
+    sphereItems.unshift({
+
+        index:
+            newIndex,
+
+        value:
+            String(
+                numbers[newIndex]
+            ),
+
+        color:
+            colors[colorIndex],
+
+        level : 0
+
+    });
+
+    colorIndex =
+        (colorIndex + 1)
+        %
+        colors.length;
+}
+// ======================================
+// DRAW
+// ======================================
+
+
+
+function drawSphere(){
+console.log(
+    sphereItems[0]?.index,
+    sphereItems[
+        sphereItems.length - 1
+    ]?.index
+);
+    const sphere =
+        document.getElementById(
+            "sphere"
+        );
+
+    sphere.innerHTML = "";
+
+    const sphereHeight =
+        sphere.clientHeight;
+
+    sphereItems.forEach(item => {
+
+        const div =
+            document.createElement(
+                "div"
+            );
+
+        div.className =
+            "sphereItem";
+
+        div.innerText =
+            item.value;
+
+        div.style.color =
+            item.color;
+
+      
+const lineHeight = 36;
+
+const y =
+     -10 +
+ item.level * lineHeight;
+
+
+        div.style.top =
+            y + "px";
+
+        div.style.left =
+            "50%";
+
+        div.style.transform =
+            "translate(-50%,-50%)";
+
+        const length =
+            String(
+                item.value
+            ).length;
+
+        const fontSize =
+            Math.max(
+              
+           
+
+  18,
+        36 - length * 0.5
+
+
+            );
+
+     div.style.fontSize = "24px";
+ //div.style.fontSize =
+    //        fontSize + "px";
+       sphere.appendChild(div);
+
+    });
+}
+
+
+
+// ======================================
+// MOVEMENT
+// ======================================
+
+
+function moveForward(step){
+
+    sphereItems.forEach(item=>{
+        item.level += step;
+    });
+
+    sphereItems =
+        sphereItems.filter(
+            item => item.level < levelCount
+        );
+
+    if(
+        sphereItems.length === 0 ||
+        sphereItems[0].level >= 1
+    ){
+        createTopItem();
+    }
+}
+
+
+function moveBackward(step){
+
+    sphereItems.forEach(item=>{
+        item.level -= step;
+    });
+
+    sphereItems =
+        sphereItems.filter(
+            item => item.level >= 0
+        );
+
+    if(
+        sphereItems.length === 0 ||
+        sphereItems[sphereItems.length-1].level <= levelCount-2
+    ){
+
+      
+colorIndex =
+    (
+        colorIndex - 1 +
+        colors.length
+    )
+    %
+    colors.length;
+
+
+const newIndex =
+
+    sphereItems.length === 0
+    ? 0
+    : prevIndex(
+        sphereItems[
+            sphereItems.length - 1
+        ].index
+    );
+
+sphereItems.push({
+
+    index:
+        newIndex,
+
+    value:
+        String(
+            numbers[newIndex]
+        ),
+
+    color:
+        colors[colorIndex],
+
+    level:
+        levelCount - 1
+
+});
+
+    }
+}
+
+// ======================================
+// SINUSOID
+// ======================================
+
+function loop(timestamp){
+
+ 
+const cycleDuration = 124.121212;  //124.121212
+
+    phase +=
+      (1.939393*Math.PI)
+             /
+        (cycleDuration * 60);
+
+    const wave =
+        Math.sin(
+            phase
+        );
+
+    const direction =
+        wave >= 0
+        ? 1
+        : -1;
+if(
+    direction > 0 &&
+    previousDirection < 0
+){
+
+   const bottomItem =
+    sphereItems[
+        sphereItems.length - 1
+    ];
+
+
+
+    const visibleIndex =
+        numbers.indexOf(
+            bottomItem.value
+        );
+
+    if(visibleIndex >= 0){
+
+        
+    }
+}
+
+previousDirection = direction;
+
+ const speed =
+        Math.abs(
+            wave
+        );
+           
+
+
+const minInterval = 121.21212; //60.606060
+const maxInterval = 242.42424; // 1939.393939
+
+
+
+const equivalentInterval =
+    maxInterval -
+    speed *
+    (
+        maxInterval -
+        minInterval
+    );
+
+const step =
+    30 / equivalentInterval;
+
+
+if(direction > 0){
+    moveForward(step);
+}
+else{
+    moveBackward(step);
+}
+
+drawSphere();
+
+requestAnimationFrame(
+    loop
+);
+}
+
+// ======================================
+// FULLSCREEN
+// ======================================
+
+function enterFullscreen(){
+
+    if(
+      !document.fullscreenElement
+    ){
+
+        document
+        .documentElement
+        .requestFullscreen()
+        .catch(()=>{});
+    }
+}
+
+document.addEventListener(
+    "click",
+    enterFullscreen,
+    {once:true}
+);
+
+document.addEventListener(
+    "touchstart",
+    enterFullscreen,
+    {once:true}
+);
+
+// ======================================
+// START
+// ======================================
+
+window.addEventListener(
+    "load",
+    ()=>{
+keepScreenAwake();
+      
+
+
+
+createTopItem();
+drawSphere();
+const openedAt = new Date();
+    document.getElementById("openTime").textContent =
+        openedAt.toLocaleString();
+        requestAnimationFrame(
+            loop
+        );
+    }
+);
+      
+let wakeLock = null;
+
+async function keepScreenAwake() {
+    try {
+        wakeLock = await navigator.wakeLock.request("screen");
+
+        wakeLock.addEventListener("release", () => {
+            console.log("Wake Lock released");
+        });
+
+        console.log("Screen Wake Lock active");
+
+    } catch (err) {
+        console.log("Wake Lock error:", err);
+    }
+}
+
+document.addEventListener("visibilitychange", async () => {
+
+    if (
+        wakeLock !== null &&
+        document.visibilityState === "visible"
+    ) {
+        await keepScreenAwake();
+    }
+
+});
+
+</script>
+
+</body>
+</html>
